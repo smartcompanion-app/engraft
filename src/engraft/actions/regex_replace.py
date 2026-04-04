@@ -50,3 +50,7 @@ class RegexReplace(Action):
             content = compiled.sub(replacer, content)
 
         target.write_text(content)
+
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        return [self.file]

@@ -28,5 +28,14 @@ class FileReplace(Action):
                 f"Source file does not exist: {source_path}"
             )
 
+        if not target_path.exists():
+            raise FileNotFoundError(
+                f"Target file does not exist: {target_path}"
+            )
+
         target_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source_path, target_path)
+
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        return [self.file]

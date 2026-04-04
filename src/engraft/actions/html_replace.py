@@ -73,3 +73,7 @@ class HtmlReplace(Action):
             output = output + "\n"
 
         target.write_text(output)
+
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        return [self.file]
