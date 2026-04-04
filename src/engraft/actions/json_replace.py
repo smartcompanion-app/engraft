@@ -74,3 +74,7 @@ class JsonReplace(Action):
             _set_at_path(data, parsed, value)
 
         target.write_text(json.dumps(data, indent=2) + "\n")
+
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        return [self.file]

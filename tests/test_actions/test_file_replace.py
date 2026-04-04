@@ -1,4 +1,3 @@
-
 import pytest
 
 from engraft.actions.file_replace import FileReplace
@@ -50,11 +49,10 @@ def test_error_source_missing(work_dir, values_dir):
         action.apply({"logo_path": "nonexistent.png"}, work_dir, values_dir)
 
 
-def test_creates_target_directory(work_dir, values_dir):
+def test_error_target_missing(work_dir, values_dir):
     source = values_dir / "img.png"
     source.write_text("image data")
 
     action = FileReplace(file="assets/images/logo.png", variable="img_path")
-    action.apply({"img_path": "img.png"}, work_dir, values_dir)
-
-    assert (work_dir / "assets/images/logo.png").read_text() == "image data"
+    with pytest.raises(FileNotFoundError):
+        action.apply({"img_path": "img.png"}, work_dir, values_dir)

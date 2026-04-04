@@ -20,3 +20,8 @@ class Action(ABC):
             values_dir: Directory containing the values file.
         """
         ...
+
+    @abstractmethod
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        ...

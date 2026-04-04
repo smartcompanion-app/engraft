@@ -14,18 +14,22 @@ def _setup_project(tmp_path):
     (project / "config.json").write_text(config)
 
     template = tmp_path / "template.yml"
-    template.write_text(yaml.dump({
-        "variables": {
-            "app_name": {"description": "App name", "default": "default"},
-        },
-        "customizations": [
+    template.write_text(
+        yaml.dump(
             {
-                "action": "json_replace",
-                "file": "config.json",
-                "replace": [{"selector": "$.name", "variable": "app_name"}],
-            },
-        ],
-    }))
+                "variables": {
+                    "app_name": {"description": "App name", "default": "default"},
+                },
+                "customizations": [
+                    {
+                        "action": "json_replace",
+                        "file": "config.json",
+                        "replace": [{"selector": "$.name", "variable": "app_name"}],
+                    },
+                ],
+            }
+        )
+    )
 
     values = tmp_path / "values.yml"
     values.write_text(yaml.dump({"app_name": "TestApp"}))
@@ -37,11 +41,17 @@ def test_apply_success(tmp_path, monkeypatch):
     project, template, values = _setup_project(tmp_path)
     monkeypatch.chdir(project)
     runner = CliRunner()
-    result = runner.invoke(main, [
-        "apply",
-        "--template", str(template),
-        "--values", str(values),
-    ], catch_exceptions=False)
+    result = runner.invoke(
+        main,
+        [
+            "apply",
+            "--template",
+            str(template),
+            "--values",
+            str(values),
+        ],
+        catch_exceptions=False,
+    )
 
     assert result.exit_code == 0, result.output
     assert "Done" in result.output
@@ -49,11 +59,16 @@ def test_apply_success(tmp_path, monkeypatch):
 
 def test_apply_missing_template(tmp_path):
     runner = CliRunner()
-    result = runner.invoke(main, [
-        "apply",
-        "--template", str(tmp_path / "nonexistent.yml"),
-        "--values", str(tmp_path / "values.yml"),
-    ])
+    result = runner.invoke(
+        main,
+        [
+            "apply",
+            "--template",
+            str(tmp_path / "nonexistent.yml"),
+            "--values",
+            str(tmp_path / "values.yml"),
+        ],
+    )
     assert result.exit_code != 0
 
 
@@ -62,9 +77,14 @@ def test_apply_missing_values(tmp_path):
     template.write_text(yaml.dump({"variables": {}, "customizations": []}))
 
     runner = CliRunner()
-    result = runner.invoke(main, [
-        "apply",
-        "--template", str(template),
-        "--values", str(tmp_path / "nonexistent.yml"),
-    ])
+    result = runner.invoke(
+        main,
+        [
+            "apply",
+            "--template",
+            str(template),
+            "--values",
+            str(tmp_path / "nonexistent.yml"),
+        ],
+    )
     assert result.exit_code != 0
