@@ -3,6 +3,7 @@ schema: spec-driven
 context: |
   Tech stack: Python CLI tool
   Build and project config: pyproject.toml, hatchling
-  Testing: pytest
-  Linting: ruff
+  Use pytest for testing, add respective test cases for all functions and classes.
+  Use ruff for linting and formatting within the CI pipeline.
+  Use https://www.conventionalcommits.org for git commit messages.
   Other: follow clean code principles, use type hints, and write docstrings for all functions and classes.
