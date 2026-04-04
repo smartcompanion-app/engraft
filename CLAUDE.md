@@ -35,3 +35,9 @@ engraft apply --template <file> --values <file>  # run the tool
 - Linting: ruff (rules: E, F, I, UP, B)
 - Testing: pytest, tests mirror src structure (`tests/test_actions/`)
 - Line length: 88 characters
+- Versioning: hatch-vcs (version derived from git tags, not hardcoded)
+
+## CI/CD
+
+- **PR pipeline** (`.github/workflows/pr.yml`): lint, format check, test matrix (3.10, 3.12, 3.13)
+- **Release pipeline** (`.github/workflows/release.yml`): triggered on GitHub Release publish → lint → format check → test matrix → build → publish to PyPI (Trusted Publisher OIDC + Sigstore signing)
