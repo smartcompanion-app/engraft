@@ -5,9 +5,11 @@ _REGISTRY: dict[str, type[Action]] = {}
 
 def register(name: str):
     """Decorator to register an action class under a name."""
+
     def decorator(cls: type[Action]) -> type[Action]:
         _REGISTRY[name] = cls
         return cls
+
     return decorator
 
 
@@ -15,9 +17,7 @@ def create_action(action_name: str, **config) -> Action:
     """Instantiate an action by name with the given config."""
     if action_name not in _REGISTRY:
         available = list(_REGISTRY.keys())
-        raise ValueError(
-            f"Unknown action: {action_name!r}. Available: {available}"
-        )
+        raise ValueError(f"Unknown action: {action_name!r}. Available: {available}")
     return _REGISTRY[action_name](**config)
 
 

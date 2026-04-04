@@ -1,4 +1,3 @@
-
 import pytest
 
 from engraft.actions.html_replace import HtmlReplace
@@ -35,9 +34,12 @@ def test_set_element_text(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//title", "variable": "my_title"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//title", "variable": "my_title"},
+        ],
+    )
     action.apply({"my_title": "New Title"}, work_dir, values_dir)
 
     content = f.read_text()
@@ -49,9 +51,12 @@ def test_set_attribute(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": '//meta[@name="Description"]/@content', "variable": "desc"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": '//meta[@name="Description"]/@content', "variable": "desc"},
+        ],
+    )
     action.apply({"desc": "My new description"}, work_dir, values_dir)
 
     content = f.read_text()
@@ -63,9 +68,12 @@ def test_set_html_lang_attribute(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//html/@lang", "variable": "lang"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//html/@lang", "variable": "lang"},
+        ],
+    )
     action.apply({"lang": "de"}, work_dir, values_dir)
 
     content = f.read_text()
@@ -76,10 +84,13 @@ def test_multiple_replacements(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//title", "variable": "my_title"},
-        {"selector": '//meta[@name="Description"]/@content', "variable": "desc"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//title", "variable": "my_title"},
+            {"selector": '//meta[@name="Description"]/@content', "variable": "desc"},
+        ],
+    )
     action.apply({"my_title": "New Title", "desc": "New desc"}, work_dir, values_dir)
 
     content = f.read_text()
@@ -91,9 +102,12 @@ def test_error_no_match(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//nonexistent", "variable": "val"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//nonexistent", "variable": "val"},
+        ],
+    )
     with pytest.raises(ValueError, match="matched no elements"):
         action.apply({"val": "x"}, work_dir, values_dir)
 
@@ -102,9 +116,12 @@ def test_error_multiple_matches(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//p", "variable": "val"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//p", "variable": "val"},
+        ],
+    )
     with pytest.raises(ValueError, match="matched 3 elements.*expected exactly 1"):
         action.apply({"val": "x"}, work_dir, values_dir)
 
@@ -113,9 +130,12 @@ def test_doctype_preserved(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//title", "variable": "my_title"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//title", "variable": "my_title"},
+        ],
+    )
     action.apply({"my_title": "Test"}, work_dir, values_dir)
 
     content = f.read_text()
@@ -126,9 +146,12 @@ def test_void_elements_not_self_closed(work_dir, values_dir):
     f = work_dir / "index.html"
     f.write_text(SAMPLE_HTML)
 
-    action = HtmlReplace(file="index.html", replace=[
-        {"selector": "//title", "variable": "my_title"},
-    ])
+    action = HtmlReplace(
+        file="index.html",
+        replace=[
+            {"selector": "//title", "variable": "my_title"},
+        ],
+    )
     action.apply({"my_title": "Test"}, work_dir, values_dir)
 
     content = f.read_text()
