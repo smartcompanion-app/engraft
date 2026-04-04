@@ -135,6 +135,16 @@ Replace an entire file with a source file referenced by a variable.
 
 The variable value is a path relative to the values file directory. Useful for binary files like images.
 
+## Releasing
+
+Versioning is automatic via [hatch-vcs](https://github.com/ofek/hatch-vcs) — the package version is derived from git tags.
+
+To publish a new release:
+
+1. Create a GitHub Release with a tag matching `vX.Y.Z` (e.g., `v0.2.0`)
+2. The release pipeline automatically runs lint, format check, and tests
+3. If all checks pass, the package is built and published to PyPI with Sigstore signing
+
 ## Development
 
 ```bash
