@@ -43,8 +43,8 @@ class RegexReplace(Action):
             def replacer(match: re.Match, new_val: str = new_value) -> str:
                 start, end = match.span("value")
                 full_start = match.start()
-                prefix = match.group()[:start - full_start]
-                suffix = match.group()[end - full_start:]
+                prefix = match.group()[: start - full_start]
+                suffix = match.group()[end - full_start :]
                 return prefix + new_val + suffix
 
             content = compiled.sub(replacer, content)

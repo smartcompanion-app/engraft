@@ -20,9 +20,7 @@ def project(tmp_path):
         json.dumps({"name": "original"}, indent=2) + "\n"
     )
     (project_dir / "src").mkdir()
-    (project_dir / "src" / "theme.ts").write_text(
-        'export const TITLE = "Original";\n'
-    )
+    (project_dir / "src" / "theme.ts").write_text('export const TITLE = "Original";\n')
     return project_dir
 
 
@@ -40,10 +38,14 @@ def _make_template(tmp_path, customizations, variables=None):
             "app_name": {"description": "Name", "default": "original"},
         }
     t = tmp_path / "template.yml"
-    t.write_text(yaml.dump({
-        "variables": variables,
-        "customizations": customizations,
-    }))
+    t.write_text(
+        yaml.dump(
+            {
+                "variables": variables,
+                "customizations": customizations,
+            }
+        )
+    )
     return t
 
 
@@ -57,13 +59,16 @@ class TestStagingDirectorySuccess:
     """Test that successful apply copies results back and cleans up."""
 
     def test_apply_modifies_project_files(self, tmp_path, project, values_dir):
-        template = _make_template(tmp_path, [
-            {
-                "action": "json_replace",
-                "file": "config.json",
-                "replace": [{"selector": "$.name", "variable": "app_name"}],
-            },
-        ])
+        template = _make_template(
+            tmp_path,
+            [
+                {
+                    "action": "json_replace",
+                    "file": "config.json",
+                    "replace": [{"selector": "$.name", "variable": "app_name"}],
+                },
+            ],
+        )
         values = _make_values(values_dir, {"app_name": "NewApp"})
 
         apply(template, values, work_dir=project)
@@ -72,13 +77,16 @@ class TestStagingDirectorySuccess:
         assert data["name"] == "NewApp"
 
     def test_staging_dir_removed_after_success(self, tmp_path, project, values_dir):
-        template = _make_template(tmp_path, [
-            {
-                "action": "json_replace",
-                "file": "config.json",
-                "replace": [{"selector": "$.name", "variable": "app_name"}],
-            },
-        ])
+        template = _make_template(
+            tmp_path,
+            [
+                {
+                    "action": "json_replace",
+                    "file": "config.json",
+                    "replace": [{"selector": "$.name", "variable": "app_name"}],
+                },
+            ],
+        )
         values = _make_values(values_dir, {"app_name": "NewApp"})
 
         apply(template, values, work_dir=project)
@@ -157,21 +165,22 @@ class TestStagingDirectoryRollback:
 class TestStagingDirectoryPreexisting:
     """Test that a pre-existing .engraft/ directory is handled."""
 
-    def test_preexisting_staging_dir_is_removed(
-        self, tmp_path, project, values_dir
-    ):
+    def test_preexisting_staging_dir_is_removed(self, tmp_path, project, values_dir):
         # Create a leftover .engraft/ directory
         leftover = project / STAGING_DIR_NAME
         leftover.mkdir()
         (leftover / "stale.txt").write_text("leftover")
 
-        template = _make_template(tmp_path, [
-            {
-                "action": "json_replace",
-                "file": "config.json",
-                "replace": [{"selector": "$.name", "variable": "app_name"}],
-            },
-        ])
+        template = _make_template(
+            tmp_path,
+            [
+                {
+                    "action": "json_replace",
+                    "file": "config.json",
+                    "replace": [{"selector": "$.name", "variable": "app_name"}],
+                },
+            ],
+        )
         values = _make_values(values_dir, {"app_name": "NewApp"})
 
         apply(template, values, work_dir=project)
