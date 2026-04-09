@@ -17,9 +17,13 @@ def _setup_project(tmp_path):
     template.write_text(
         yaml.dump(
             {
-                "variables": {
-                    "app_name": {"description": "App name", "default": "default"},
-                },
+                "variables": [
+                    {
+                        "variable": "app_name",
+                        "description": "App name",
+                        "default": "default",
+                    },
+                ],
                 "customizations": [
                     {
                         "action": "json_replace",
@@ -74,7 +78,7 @@ def test_apply_missing_template(tmp_path):
 
 def test_apply_missing_values(tmp_path):
     template = tmp_path / "template.yml"
-    template.write_text(yaml.dump({"variables": {}, "customizations": []}))
+    template.write_text(yaml.dump({"variables": [], "customizations": []}))
 
     runner = CliRunner()
     result = runner.invoke(

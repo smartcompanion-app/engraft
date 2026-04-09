@@ -6,16 +6,18 @@ CLI tool that applies customizations to any project without requiring templating
 
 ```
 CLI (cli.py)
- └─ engine.apply()          # resolves variables, runs actions in order
+ └─ engine.apply()          # resolves variables, builds actions, runs them
      ├─ models.py            # parses template + values YAML files
      └─ actions/             # plugin registry for action types
-         ├─ __init__.py      # registry: @register decorator + create_action()
-         ├─ base.py          # Action ABC (apply method)
+         ├─ __init__.py      # registry: @register decorator + get_action_class()
+         ├─ base.py          # Action ABC (zero-arg apply method)
          ├─ json_replace.py  # JSONPath-like selectors
          ├─ html_replace.py  # XPath selectors via lxml
          ├─ regex_replace.py # named capture group (?P<value>...)
          └─ file_replace.py  # whole-file replacement
 ```
+
+Actions are fully resolved at construction: each holds `target: Path`, `selector: str`, `value: str` (or `target: Path`, `source_path: Path` for file_replace). `apply()` takes no arguments. The engine expands multi-entry `replace` lists into individual actions and skips entries for unset variables.
 
 New actions: create a dataclass in `actions/`, use `@register("name")`, import it in `actions/__init__.py`.
 

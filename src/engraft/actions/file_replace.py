@@ -11,26 +11,14 @@ from engraft.actions.base import Action
 class FileReplace(Action):
     """Replace a file in the working directory with a source file."""
 
-    file: str
-    variable: str
+    target: Path
+    source_path: Path
 
-    def apply(
-        self,
-        variables: dict[str, str],
-        work_dir: Path,
-        values_dir: Path,
-    ) -> None:
-        source_path = values_dir / variables[self.variable]
-        target_path = work_dir / self.file
+    def apply(self) -> None:
+        if not self.source_path.exists():
+            raise FileNotFoundError(f"Source file does not exist: {self.source_path}")
 
-        if not source_path.exists():
-            raise FileNotFoundError(f"Source file does not exist: {source_path}")
+        if not self.target.exists():
+            raise FileNotFoundError(f"Target file does not exist: {self.target}")
 
-        if not target_path.exists():
-            raise FileNotFoundError(f"Target file does not exist: {target_path}")
-
-        shutil.copy2(source_path, target_path)
-
-    def target_files(self) -> list[str]:
-        """Return project-relative file paths this action operates on."""
-        return [self.file]
+        shutil.copy2(self.source_path, self.target)

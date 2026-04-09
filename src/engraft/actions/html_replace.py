@@ -1,5 +1,5 @@
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from lxml import html as lxml_html
@@ -18,53 +18,40 @@ def _extract_doctype(raw_html: str) -> str | None:
 @register("html_replace")
 @dataclass
 class HtmlReplace(Action):
-    """Replace values in HTML files using XPath selectors."""
+    """Replace a value in an HTML file using an XPath selector."""
 
-    file: str
-    replace: list[dict[str, str]] = field(default_factory=list)
+    target: Path
+    selector: str
+    value: str
 
-    def apply(
-        self,
-        variables: dict[str, str],
-        work_dir: Path,
-        values_dir: Path,
-    ) -> None:
-        target = work_dir / self.file
-        raw_html = target.read_text()
+    def apply(self) -> None:
+        raw_html = self.target.read_text()
         doctype = _extract_doctype(raw_html)
 
         doc = lxml_html.fromstring(raw_html)
 
-        for entry in self.replace:
-            selector = entry["selector"]
-            var_name = entry["variable"]
-            value = variables[var_name]
+        results = doc.xpath(self.selector)
 
-            results = doc.xpath(selector)
+        if len(results) == 0:
+            raise ValueError(
+                f"XPath selector {self.selector!r} matched no elements "
+                f"in {self.target.name}"
+            )
+        if len(results) > 1:
+            raise ValueError(
+                f"XPath selector {self.selector!r} matched {len(results)} elements "
+                f"in {self.target.name}, expected exactly 1"
+            )
 
-            if len(results) == 0:
-                raise ValueError(
-                    f"XPath selector {selector!r} matched no elements in {self.file}"
-                )
-            if len(results) > 1:
-                raise ValueError(
-                    f"XPath selector {selector!r} matched {len(results)} elements "
-                    f"in {self.file}, expected exactly 1"
-                )
+        result = results[0]
 
-            result = results[0]
+        if isinstance(result, _Element):
+            result.text = self.value
+        else:
+            parent = result.getparent()
+            attr_name = result.attrname
+            parent.set(attr_name, self.value)
 
-            if isinstance(result, _Element):
-                # Element node — set text content
-                result.text = value
-            else:
-                # Attribute result — lxml returns _ElementStringResult
-                # which has getparent() and attrname
-                parent = result.getparent()
-                attr_name = result.attrname
-                parent.set(attr_name, value)
-
-        # Serialize back to HTML
         output = lxml_html.tostring(doc, encoding="unicode", method="html")
 
         if doctype:
@@ -72,8 +59,4 @@ class HtmlReplace(Action):
         else:
             output = output + "\n"
 
-        target.write_text(output)
-
-    def target_files(self) -> list[str]:
-        """Return project-relative file paths this action operates on."""
-        return [self.file]
+        self.target.write_text(output)
