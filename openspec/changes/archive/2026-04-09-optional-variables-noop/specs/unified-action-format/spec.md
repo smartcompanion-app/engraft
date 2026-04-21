@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: json_replace action with selector-variable list
 The `json_replace` action YAML entry SHALL accept a `replace` list of `{selector, variable}` entries for convenience. At parse time, each entry SHALL be expanded into a separate `JsonReplace` action object holding a single `selector`, the resolved `value`, and the absolute `target` path. The `apply()` method SHALL take no arguments.
@@ -59,14 +59,3 @@ The `html_replace` action YAML entry SHALL accept a `replace` list of `{selector
 #### Scenario: Multiple HTML replacements on same file
 - **WHEN** the YAML entry has two replace entries targeting different XPath selectors
 - **THEN** two separate `HtmlReplace` action objects SHALL be created
-
-### Requirement: Consistent action naming
-All actions SHALL use the `*_replace` naming convention: `json_replace`, `html_replace`, `regex_replace`, `file_replace`.
-
-#### Scenario: Actions registered under new names
-- **WHEN** a template YAML uses `action: json_replace`
-- **THEN** the action registry SHALL resolve to the `JsonReplace` action class
-
-#### Scenario: Old action names rejected
-- **WHEN** a template YAML uses `action: json_set` (old name)
-- **THEN** the action registry SHALL raise an error indicating the action is unknown

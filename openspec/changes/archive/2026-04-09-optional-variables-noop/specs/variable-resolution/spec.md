@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Variables defined with description and default
 Each variable in the template YAML SHALL be defined as an array entry with a `variable` field (name), a `description` field, and an optional `default` field. When `default` is not provided, the variable is unset unless the values file supplies a value.
@@ -30,12 +30,7 @@ Variables provided in the values file SHALL override the defaults from the templ
 - **WHEN** a template defines variable `theme_color` without a default and the values file does not include `theme_color`
 - **THEN** `theme_color` is absent from the resolved variables dict
 
-### Requirement: All action values reference variable names
-Customization actions SHALL reference variable names, not inline literal values. The resolved variable value is used at apply time.
-
-#### Scenario: Action references variable
-- **WHEN** an action specifies `replace: primary_color`
-- **THEN** the action uses the resolved value of the `primary_color` variable
+## ADDED Requirements
 
 ### Requirement: Variables use array format
 Variables in the template YAML SHALL be defined as an array of objects, each with a `variable` field as the identifier, a `description` field, and an optional `default` field.
