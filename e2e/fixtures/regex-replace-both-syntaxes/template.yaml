@@ -1,0 +1,14 @@
+variables:
+  service_name:
+    description: Service name (replaced via (?P<value>...) syntax)
+  service_port:
+    description: Service port (replaced via (?<value>...) syntax)
+
+customizations:
+  - action: regex_replace
+    file: config.ini
+    replace:
+      - selector: 'name\s*=\s*(?P<value>\S+)'
+        variable: service_name
+      - selector: 'port\s*=\s*(?<value>\d+)'
+        variable: service_port

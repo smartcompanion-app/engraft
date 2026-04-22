@@ -1,0 +1,14 @@
+variables:
+  project_name:
+    description: Project name (provided in values)
+  tagline:
+    description: Optional tagline (no default, not provided in values — should be skipped)
+
+customizations:
+  - action: json_replace
+    file: package.json
+    replace:
+      - selector: $.name
+        variable: project_name
+      - selector: $.description
+        variable: tagline

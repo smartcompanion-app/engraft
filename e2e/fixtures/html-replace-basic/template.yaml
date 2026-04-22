@@ -1,0 +1,14 @@
+variables:
+  page_title:
+    description: Page title text
+  canonical_url:
+    description: Canonical URL for the page
+
+customizations:
+  - action: html_replace
+    file: index.html
+    replace:
+      - selector: //title
+        variable: page_title
+      - selector: //link[@rel='canonical']/@href
+        variable: canonical_url
