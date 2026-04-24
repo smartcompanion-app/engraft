@@ -1,6 +1,6 @@
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from engraft.actions import register
@@ -47,20 +47,34 @@ def _set_at_path(obj: dict | list, path: list[str | int], value: str) -> None:
 @register("json_replace")
 @dataclass
 class JsonReplace(Action):
-    """Replace a value in a JSON file using a JSONPath-like selector."""
+    """Replace values in JSON files using JSONPath-like selectors."""
 
-    target: Path
-    selector: str
-    value: str
+    file: str
+    replace: list[dict[str, str]] = field(default_factory=list)
 
-    def apply(self) -> None:
-        data = json.loads(self.target.read_text())
+    def apply(
+        self,
+        variables: dict[str, str],
+        work_dir: Path,
+        values_dir: Path,
+    ) -> None:
+        target = work_dir / self.file
+        data = json.loads(target.read_text())
 
-        selector = self.selector
-        if selector.startswith("$."):
-            selector = selector[2:]
+        for entry in self.replace:
+            selector = entry["selector"]
+            var_name = entry["variable"]
 
-        parsed = _parse_path(selector)
-        _set_at_path(data, parsed, self.value)
+            # Strip $. prefix
+            if selector.startswith("$."):
+                selector = selector[2:]
 
-        self.target.write_text(json.dumps(data, indent=2) + "\n")
+            value = variables[var_name]
+            parsed = _parse_path(selector)
+            _set_at_path(data, parsed, value)
+
+        target.write_text(json.dumps(data, indent=2) + "\n")
+
+    def target_files(self) -> list[str]:
+        """Return project-relative file paths this action operates on."""
+        return [self.file]

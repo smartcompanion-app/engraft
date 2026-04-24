@@ -3,51 +3,39 @@ from pathlib import Path
 
 import yaml
 
+from engraft.actions import Action, create_action
+
 
 @dataclass
 class Variable:
-    """A template variable definition."""
-
     name: str
     description: str
-    default: str | None = None
+    default: str
 
 
 @dataclass
 class Template:
-    """Parsed template with variable definitions and raw customization entries."""
-
-    variables: list[Variable]
-    customizations: list[dict]
+    variables: dict[str, Variable]
+    customizations: list[Action]
 
 
 def parse_template(path: Path) -> Template:
-    """Load a template YAML file into a Template model.
-
-    Variables are parsed from array format. Customization entries are
-    stored as raw dicts for later expansion by the engine.
-    """
+    """Load a template YAML file into a Template model."""
     with open(path) as f:
         data = yaml.safe_load(f)
 
-    variables: list[Variable] = []
-    seen_names: set[str] = set()
-    for var_data in data.get("variables") or []:
-        name = var_data["variable"]
-        if name in seen_names:
-            raise ValueError(f"Duplicate variable name: {name!r}")
-        seen_names.add(name)
-        variables.append(
-            Variable(
-                name=name,
-                description=var_data.get("description", ""),
-                default=var_data.get("default"),
-            )
+    variables: dict[str, Variable] = {}
+    for name, var_data in (data.get("variables") or {}).items():
+        variables[name] = Variable(
+            name=name,
+            description=var_data.get("description", ""),
+            default=var_data.get("default", ""),
         )
 
-    customizations: list[dict] = []
+    customizations: list[Action] = []
     for item in data.get("customizations") or []:
-        customizations.append(dict(item))
+        action_name = item.pop("action")
+        customizations.append(create_action(action_name, **item))
 
     return Template(variables=variables, customizations=customizations)
 

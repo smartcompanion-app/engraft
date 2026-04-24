@@ -13,12 +13,12 @@ def register(name: str):
     return decorator
 
 
-def get_action_class(action_name: str) -> type[Action]:
-    """Look up a registered action class by name."""
+def create_action(action_name: str, **config) -> Action:
+    """Instantiate an action by name with the given config."""
     if action_name not in _REGISTRY:
         available = list(_REGISTRY.keys())
         raise ValueError(f"Unknown action: {action_name!r}. Available: {available}")
-    return _REGISTRY[action_name]
+    return _REGISTRY[action_name](**config)
 
 
 # Import action modules to trigger registration
@@ -29,4 +29,4 @@ from engraft.actions import (  # noqa: E402
     regex_replace,  # noqa: F401
 )
 
-__all__ = ["Action", "get_action_class", "register"]
+__all__ = ["Action", "create_action", "register"]

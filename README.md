@@ -42,7 +42,7 @@ Create a template file `engraft.template.yml`:
 
 ```yaml
 variables:
-  - variable: app_name
+  app_name:
     description: Application name
     default: DefaultApp
 
@@ -74,22 +74,6 @@ Result — `config.json` now contains:
   "version": "1.0.0"
 }
 ```
-
-## Optional Variables
-
-Variables without a `default` are optional. If the values file doesn't provide a value, any action referencing that variable is silently skipped (noop):
-
-```yaml
-variables:
-  - variable: app_name
-    description: Application name
-    default: DefaultApp       # always applied (falls back to default)
-  - variable: theme_color
-    description: Primary theme color
-                              # no default — skipped unless values file sets it
-```
-
-This lets template authors define customization points that consumers can opt into without requiring every variable to be set.
 
 ## Action Reference
 
