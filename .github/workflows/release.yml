@@ -134,6 +134,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
       - uses: actions/download-artifact@v4
         with:
           name: py-dist
@@ -144,6 +146,9 @@ jobs:
           path: ts-dist/
       - name: Install Python wheel
         run: pip install py-dist/*.whl
+      - name: Install TypeScript runtime deps
+        working-directory: typescript
+        run: npm ci --omit=dev
       - name: Stage TypeScript bundle for e2e harness
         run: |
           mkdir -p typescript/dist
