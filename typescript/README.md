@@ -26,7 +26,7 @@ The original project stays untouched. Run `engraft apply` and the customizations
 Requires Node.js 20 or newer.
 
 ```
-npm install -g engraft
+npm install -g @smartcompanion/engraft
 ```
 
 ## Quick Start
