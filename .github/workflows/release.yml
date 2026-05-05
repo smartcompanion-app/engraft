@@ -190,6 +190,6 @@ jobs:
           name: ts-dist
           path: ts-dist/
       - name: Publish to npm
-        run: npm publish ts-dist/*.tgz
+        run: npm publish ./ts-dist/*.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
