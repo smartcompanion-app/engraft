@@ -1,0 +1,10 @@
+variables:
+  flag:
+    description: Flag value — written as 'yes' in values.yaml to exercise YAML 1.2 parsing (must be string 'yes', not boolean true)
+
+customizations:
+  - action: json_replace
+    file: config.json
+    replace:
+      - selector: $.flag
+        variable: flag

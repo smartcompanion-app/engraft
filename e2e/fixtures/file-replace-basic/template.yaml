@@ -1,0 +1,8 @@
+variables:
+  logo_source:
+    description: Path (relative to values dir) to the replacement logo
+
+customizations:
+  - action: file_replace
+    file: assets/logo.svg
+    variable: logo_source

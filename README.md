@@ -2,158 +2,41 @@
 
 Apply customizations to any project without templating placeholders.
 
-## The Problem
+engraft keeps the source repo clean and runnable while providing a declarative, reproducible customization layer on top. Repo authors declare **what** can be customized in a template file; consumers supply **their** choices in a values file; `engraft apply` merges them into the working tree in place.
 
-Customizing a project (e.g., white-label products) forces a choice between bad options:
+## Implementations
 
-- **Templating tools** (Cookiecutter, Copier, Yeoman) require `{{ placeholders }}` in source code — the repo is no longer a working app
-- **Forking** leads to diverging codebases that are painful to sync with upstream
-- **Manual editing** is error-prone, undocumented, and impossible to reproduce
+Two implementations with identical behaviour, shipped as native packages in each ecosystem:
 
-engraft solves this by keeping the source repo clean and runnable while providing a declarative, reproducible customization layer on top.
+- **Python** — see [`python/README.md`](python/README.md), published to [PyPI](https://pypi.org/project/engraft/)
+- **TypeScript / Node.js** — see [`typescript/README.md`](typescript/README.md), published to npm
 
-## How It Works
+Both implementations accept the same template and values YAML format, ship the same four actions (`json_replace`, `html_replace`, `regex_replace`, `file_replace`), and produce identical output for any given input.
 
-engraft uses a two-file model:
+## Shared behavioural contract
 
-- **Template file** — defines what can be customized and how (maintained by the repo author)
-- **Values file** — contains the consumer's customization values
+The `e2e/` directory holds a pytest-based end-to-end harness that is the source of truth for cross-implementation parity. Each fixture under `e2e/fixtures/` describes an input project, a template, a values file, and the expected post-apply tree. The harness runs every fixture against **both** the Python CLI (`engraft`) and the TypeScript CLI (`node typescript/dist/cli.js`) and asserts that the resulting project tree matches the expected output semantically (format-aware comparators for JSON, YAML, HTML; plain text otherwise).
 
-The original project stays untouched. Run `engraft apply` and the customizations are applied in place.
-
-## Installation
-
-```
-pip install engraft
-```
-
-## Quick Start
-
-Given a project with a `config.json`:
-
-```json
-{
-  "name": "DefaultApp",
-  "version": "1.0.0"
-}
-```
-
-Create a template file `engraft.template.yml`:
-
-```yaml
-variables:
-  app_name:
-    description: Application name
-    default: DefaultApp
-
-customizations:
-  - action: json_replace
-    file: config.json
-    replace:
-      - selector: $.name
-        variable: app_name
-```
-
-Create a values file `engraft.values.yml`:
-
-```yaml
-app_name: MyApp
-```
-
-Apply:
-
-```
-engraft apply --template engraft.template.yml --values engraft.values.yml
-```
-
-Result — `config.json` now contains:
-
-```json
-{
-  "name": "MyApp",
-  "version": "1.0.0"
-}
-```
-
-## Action Reference
-
-### `json_replace`
-
-Replace values in JSON files using JSONPath-like selectors.
-
-```yaml
-- action: json_replace
-  file: app.json
-  replace:
-    - selector: $.expo.name
-      variable: app_name
-    - selector: $.expo.extra.items[0].label
-      variable: item_label
-```
-
-Selectors use dot notation with optional array indices: `$.path.to.key` or `$.array[0].field`.
-
-### `html_replace`
-
-Replace values in HTML files using XPath selectors. Supports both element text and attribute values.
-
-```yaml
-- action: html_replace
-  file: index.html
-  replace:
-    - selector: //title
-      variable: page_title
-    - selector: //meta[@name='description']/@content
-      variable: page_description
-```
-
-The selector must match exactly one element or attribute. Matching zero or more than one is an error.
-
-### `regex_replace`
-
-Replace values in any text file using regex with a named capture group.
-
-```yaml
-- action: regex_replace
-  file: src/theme.ts
-  replace:
-    - selector: '(PRIMARY_COLOR\s*=\s*)"(?P<value>[^"]*)"'
-      variable: primary_color
-```
-
-The selector **must** contain a `(?P<value>...)` named capture group. Only the captured group is replaced; the surrounding match is preserved.
-
-### `file_replace`
-
-Replace an entire file with a source file referenced by a variable.
-
-```yaml
-- action: file_replace
-  file: assets/logo.png
-  variable: logo
-```
-
-The variable value is a path relative to the values file directory. Useful for binary files like images.
-
-## Releasing
-
-Versioning is automatic via [hatch-vcs](https://github.com/ofek/hatch-vcs) — the package version is derived from git tags.
-
-To publish a new release:
-
-1. Create a GitHub Release with a tag matching `vX.Y.Z` (e.g., `v0.2.0`)
-2. The release pipeline automatically runs lint, format check, and tests
-3. If all checks pass, the package is built and published to PyPI with Sigstore signing
-
-## Development
+Running the harness:
 
 ```bash
-# Install with dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run linter
-ruff check src/ tests/
+# From the repo root:
+pip install -e python/
+(cd typescript && npm install && npm run build)
+pytest e2e/
 ```
+
+Setting `ENGRAFT_IMPL=python` or `ENGRAFT_IMPL=typescript` restricts the harness to one implementation.
+
+## Repository layout
+
+```
+python/       # Python implementation (published to PyPI as `engraft`)
+typescript/   # TypeScript implementation (published to npm as `engraft`)
+e2e/          # Shared behavioural fixtures and pytest harness
+openspec/     # OpenSpec change proposals and specifications
+```
+
+## License
+
+See [LICENSE](LICENSE).

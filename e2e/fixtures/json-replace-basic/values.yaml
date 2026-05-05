@@ -1,0 +1,4 @@
+project_name: acme-web
+project_version: 2.3.1
+lodash_version: ^4.17.21
+first_keyword: acme

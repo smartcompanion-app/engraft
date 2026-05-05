@@ -1,0 +1,15 @@
+variables:
+  project_name:
+    description: Project name (used by the successful first action)
+  logo_source:
+    description: Path (relative to values dir) to the replacement logo — points to a non-existent file to force action 2 to fail
+
+customizations:
+  - action: json_replace
+    file: package.json
+    replace:
+      - selector: $.name
+        variable: project_name
+  - action: file_replace
+    file: assets/logo.svg
+    variable: logo_source
