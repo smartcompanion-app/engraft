@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -50,9 +50,12 @@ export const buildProgram = (): Command => {
 const isMain = (): boolean => {
   if (!process.argv[1]) return false;
   try {
-    return (
-      fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
-    );
+    // npm installs bins as symlinks (node_modules/.bin/engraft → dist/cli.js),
+    // so argv[1] and import.meta.url disagree until both are realpath'd.
+    const here = realpathSync(fileURLToPath(import.meta.url));
+    const argv1 = path.resolve(process.argv[1]);
+    const invoked = existsSync(argv1) ? realpathSync(argv1) : argv1;
+    return here === invoked;
   } catch {
     return false;
   }
