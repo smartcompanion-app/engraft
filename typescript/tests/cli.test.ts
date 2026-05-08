@@ -1,5 +1,13 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -77,5 +85,63 @@ customizations:
       readFileSync(path.join(projectDir, "config.json"), "utf8"),
     );
     expect(data.name).toBe("CliApp");
+  });
+
+  // Regression test for the silent no-op bug: when invoked via an npm bin
+  // symlink, isMain() must still recognise the entry point. argv[1] points at
+  // the unresolved symlink, while import.meta.url resolves to the real file —
+  // both sides need to be normalised before comparing.
+  it("apply works when invoked through a symlink (npm bin shape)", () => {
+    if (!existsSync(cliPath)) return;
+
+    const root = mkdtempSync(path.join(tmpdir(), "engraft-cli-symlink-"));
+    const projectDir = path.join(root, "project");
+    const binDir = path.join(root, "bin");
+    mkdirSync(projectDir, { recursive: true });
+    mkdirSync(binDir, { recursive: true });
+
+    writeFileSync(
+      path.join(projectDir, "config.json"),
+      JSON.stringify({ name: "original" }, null, 2) + "\n",
+    );
+    writeFileSync(
+      path.join(root, "template.yml"),
+      `variables:
+  name:
+    description: name
+    default: original
+customizations:
+  - action: json_replace
+    file: config.json
+    replace:
+      - selector: "$.name"
+        variable: name
+`,
+    );
+    writeFileSync(path.join(root, "values.yml"), "name: ViaSymlink\n");
+
+    chmodSync(cliPath, 0o755);
+    const symlinkPath = path.join(binDir, "engraft");
+    symlinkSync(cliPath, symlinkPath);
+
+    const result = spawnSync(
+      "node",
+      [
+        symlinkPath,
+        "apply",
+        "--template",
+        path.join(root, "template.yml"),
+        "--values",
+        path.join(root, "values.yml"),
+      ],
+      { cwd: projectDir, encoding: "utf8" },
+    );
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("Done.");
+    const data = JSON.parse(
+      readFileSync(path.join(projectDir, "config.json"), "utf8"),
+    );
+    expect(data.name).toBe("ViaSymlink");
   });
 });
