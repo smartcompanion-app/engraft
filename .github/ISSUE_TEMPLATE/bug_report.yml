@@ -1,0 +1,80 @@
+name: Bug report
+description: Report something that does not work as documented.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happens, and what did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: template
+    attributes:
+      label: Template file
+      description: >
+        The `customizations` entry that misbehaves — trimmed down to the
+        smallest version that still reproduces it.
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: values
+    attributes:
+      label: Values file
+      description: The matching values, with anything sensitive replaced.
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: target
+    attributes:
+      label: Target file
+      description: >
+        The file engraft was pointed at, before the apply. Include enough of it
+        that the selector has something to match.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: action
+    attributes:
+      label: Action
+      multiple: true
+      options:
+        - json_replace
+        - html_replace
+        - regex_replace
+        - file_replace
+        - not action-specific
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: engraft version
+      description: The output of `engraft --version`.
+      placeholder: "0.2.2"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node version and operating system.
+      placeholder: "Node 22.22.2, macOS 15"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output
+      description: What engraft printed, including any error.
+      render: shell

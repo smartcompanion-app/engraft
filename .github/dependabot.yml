@@ -1,0 +1,27 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      # Minors and patches only. Grouping majors in here too means a single
+      # incompatible one blocks every other update in the pull request. Majors
+      # arrive as their own pull requests, so each is assessed -- and fails --
+      # on its own.
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest a capability engraft does not have yet.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: >
+        What are you trying to customize that engraft cannot reach today?
+        Describe the file and the part of it you need to change.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: >
+        If you have a template syntax in mind, sketch it. Template and values
+        files are a published format — anything added has to keep working for
+        everyone already on it.
+      render: yaml
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of change is this?
+      options:
+        - A new action
+        - A change to an existing action
+        - A CLI change
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: >
+        Workarounds you have tried — including whether `regex_replace` can
+        already do this, since it is the general-purpose escape hatch.
