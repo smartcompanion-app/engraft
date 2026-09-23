@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise", "node", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "error",
+    "no-console": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+
+    // engraft applies customizations strictly in the order the template lists
+    // them, and copies files in and out of the staging directory one at a time
+    // so a failure leaves a predictable partial state. Sequential awaits are
+    // the behaviour, not an oversight.
+    "no-await-in-loop": "off"
+  },
+  "ignorePatterns": ["dist", "coverage", "tests/e2e/fixtures"],
+  "overrides": [
+    {
+      // Actions register themselves as a side effect of being imported, which
+      // is exactly what this barrel exists to trigger.
+      "files": ["src/actions/index.ts"],
+      "rules": {
+        "import/no-unassigned-import": "off"
+      }
+    },
+    {
+      "files": ["tests/**/*.ts"],
+      "rules": {
+        "typescript/no-non-null-assertion": "off",
+
+        // Vitest's `expect(value, message)` carries the failure message this
+        // suite relies on. The rule is modelled on Jest, where that second
+        // argument does not exist.
+        "vitest/valid-expect": "off"
+      }
+    }
+  ]
+}
