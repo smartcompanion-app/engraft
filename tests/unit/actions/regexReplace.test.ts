@@ -103,4 +103,30 @@ describe("RegexReplace", () => {
     await action.apply({ c: null }, workDir, workDir);
     expect(readFileSync(path.join(workDir, "t.ts"), "utf8")).toContain("orig");
   });
+  // The captured text also appears in the pattern's prefix. Locating the group
+  // by searching the match for its own text would rewrite the first run, not
+  // the captured one.
+  it("replaces the captured run, not an identical one earlier in the match", async () => {
+    const workDir = makeWorkdir({ "app.ts": 'const version = "version";\n' });
+    const action = new RegexReplace({
+      file: "app.ts",
+      replace: [{ selector: 'version = "(?<value>[^"]*)"', variable: "v" }],
+    });
+    await action.apply({ v: "1.2.3" }, workDir, workDir);
+    expect(readFileSync(path.join(workDir, "app.ts"), "utf8")).toBe('const version = "1.2.3";\n');
+  });
+
+  it("replaces every occurrence of a repeated pattern", async () => {
+    const workDir = makeWorkdir({
+      "t.ts": 'a = "old";\nb = "keep";\nc = "old";\n',
+    });
+    const action = new RegexReplace({
+      file: "t.ts",
+      replace: [{ selector: '"(?<value>old)"', variable: "v" }],
+    });
+    await action.apply({ v: "new" }, workDir, workDir);
+    expect(readFileSync(path.join(workDir, "t.ts"), "utf8")).toBe(
+      'a = "new";\nb = "keep";\nc = "new";\n',
+    );
+  });
 });

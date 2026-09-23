@@ -35,25 +35,26 @@ export class RegexReplace implements Action {
         );
       }
 
-      const pattern = new RegExp(normalized, "g");
-      let matched = false;
-      content = content.replace(pattern, (match, ...rest) => {
-        matched = true;
-        const last = rest[rest.length - 1];
-        const groups =
-          last && typeof last === "object" ? (last as Record<string, string | undefined>) : {};
-        const valueMatch = groups.value;
-        if (valueMatch === undefined) return match;
-        // Find the value group's position within the match to preserve prefix/suffix.
-        const idx = match.indexOf(valueMatch);
-        if (idx === -1) return match;
-        return match.slice(0, idx) + newValue + match.slice(idx + valueMatch.length);
-      });
+      // The `d` flag records where each group matched. Searching the match
+      // text for the captured string instead would rewrite the wrong run
+      // whenever the same text also appears in the pattern's prefix, as in
+      // `version="(?<value>[^"]*)"` against `version="version"`.
+      const pattern = new RegExp(normalized, "dg");
+      const matches = [...content.matchAll(pattern)];
 
-      if (!matched) {
+      if (matches.length === 0) {
         throw new Error(
           `Pattern ${JSON.stringify(entry.selector)} did not match anything in ${this.file}`,
         );
+      }
+
+      // Splice from the end so each replacement leaves the offsets of the
+      // ones still to come untouched.
+      for (const match of matches.toReversed()) {
+        const span = match.indices?.groups?.["value"];
+        if (!span) continue;
+        const [start, end] = span;
+        content = content.slice(0, start) + newValue + content.slice(end);
       }
     }
 

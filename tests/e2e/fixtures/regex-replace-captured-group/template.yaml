@@ -1,0 +1,14 @@
+variables:
+  app_version:
+    description: Version string. The captured text is identical to the identifier in front of it, so the action must use the capture group's position rather than searching the match for its text.
+  build_id:
+    description: Build identifier, same shape.
+
+customizations:
+  - action: regex_replace
+    file: src/version.ts
+    replace:
+      - selector: 'version = "(?<value>[^"]*)"'
+        variable: app_version
+      - selector: 'build = "(?P<value>[^"]*)"'
+        variable: build_id
