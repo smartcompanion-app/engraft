@@ -122,9 +122,13 @@ release process. Taking part means following our
 
 engraft shipped as two parallel implementations — a Python package on PyPI and
 this one on npm — through v0.2.2. Keeping two codebases byte-identical cost
-more than it returned, so TypeScript is now the only implementation. The Python
-package is no longer maintained; `@smartcompanion/engraft` accepts the same
-template and values files.
+more than it returned, so TypeScript is now the only implementation.
+
+The [`engraft` package on PyPI](https://pypi.org/project/engraft/) is archived.
+It will receive no further releases, but it was deliberately not yanked, so an
+existing pin keeps installing. `@smartcompanion/engraft` accepts the same
+template and values files — migrating is a change of install command, not of
+configuration.
 
 ## License
 
