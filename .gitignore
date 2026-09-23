@@ -1,13 +1,13 @@
-.pytest_cache/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.claude/settings.local.json
-.ruff_cache/
-*.egg-info/
+node_modules/
 dist/
-build/
-.venv/
-venv/
+coverage/
+*.tsbuildinfo
+
+# engraft's own staging directory, created and removed by `engraft apply`.
+# Tracked here in case a crashed run leaves one behind.
 .engraft/
+
+.DS_Store
+
+# npm pack output
+*.tgz

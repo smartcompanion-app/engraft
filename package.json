@@ -1,0 +1,76 @@
+{
+  "name": "@smartcompanion/engraft",
+  "version": "0.2.2",
+  "description": "Apply customizations to any project without templating placeholders",
+  "keywords": [
+    "cli",
+    "customization",
+    "json",
+    "regex",
+    "scaffolding",
+    "templating",
+    "white-label",
+    "xpath",
+    "yaml"
+  ],
+  "homepage": "https://github.com/smartcompanion-app/engraft#readme",
+  "bugs": {
+    "url": "https://github.com/smartcompanion-app/engraft/issues"
+  },
+  "license": "BSD-2-Clause",
+  "author": "SmartCompanion Team <hello@smartcompanion.app> (https://smartcompanion.app)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartcompanion-app/engraft.git"
+  },
+  "bin": {
+    "engraft": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "npm run build && vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "npm run build && vitest run --project e2e",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "check:publish": "publint --strict",
+    "changeset": "changeset",
+    "version": "changeset version && npm install --package-lock-only",
+    "release": "npm run build && changeset publish"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "js-yaml": "^5.4.2",
+    "jsdom": "^30.1.1"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.2",
+    "oxfmt": "^0.70.0",
+    "oxlint": "^1.85.0",
+    "publint": "^0.3.24",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "esbuild": "^0.28.2"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  }
+}

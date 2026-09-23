@@ -1,0 +1,15 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# e2e fixtures are byte-for-byte inputs and expected outputs. An editor that
+# trims or re-indents them changes what the suite asserts.
+[tests/e2e/fixtures/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
