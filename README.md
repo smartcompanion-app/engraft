@@ -1,42 +1,131 @@
 # engraft
 
-Apply customizations to any project without templating placeholders.
+[![ci](https://github.com/smartcompanion-app/engraft/actions/workflows/ci.yml/badge.svg)](https://github.com/smartcompanion-app/engraft/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@smartcompanion/engraft)](https://www.npmjs.com/package/@smartcompanion/engraft)
+[![node](https://img.shields.io/node/v/@smartcompanion/engraft)](https://nodejs.org)
+[![license](https://img.shields.io/npm/l/@smartcompanion/engraft)](LICENSE)
 
-engraft keeps the source repo clean and runnable while providing a declarative, reproducible customization layer on top. Repo authors declare **what** can be customized in a template file; consumers supply **their** choices in a values file; `engraft apply` merges them into the working tree in place.
+**Apply customizations to any project without templating placeholders.**
 
-## Implementations
+Your repository stays clean and runnable. The customization lives beside it, in
+two files: one the maintainer writes, one the consumer writes.
 
-Two implementations with identical behaviour, shipped as native packages in each ecosystem:
-
-- **Python** — see [`python/README.md`](python/README.md), published to [PyPI](https://pypi.org/project/engraft/)
-- **TypeScript / Node.js** — see [`typescript/README.md`](typescript/README.md), published to npm
-
-Both implementations accept the same template and values YAML format, ship the same four actions (`json_replace`, `html_replace`, `regex_replace`, `file_replace`), and produce identical output for any given input.
-
-## Shared behavioural contract
-
-The `e2e/` directory holds a pytest-based end-to-end harness that is the source of truth for cross-implementation parity. Each fixture under `e2e/fixtures/` describes an input project, a template, a values file, and the expected post-apply tree. The harness runs every fixture against **both** the Python CLI (`engraft`) and the TypeScript CLI (`node typescript/dist/cli.js`) and asserts that the resulting project tree matches the expected output semantically (format-aware comparators for JSON, YAML, HTML; plain text otherwise).
-
-Running the harness:
-
-```bash
-# From the repo root:
-pip install -e python/
-(cd typescript && npm install && npm run build)
-pytest e2e/
+```shell
+npm install -g @smartcompanion/engraft
 ```
 
-Setting `ENGRAFT_IMPL=python` or `ENGRAFT_IMPL=typescript` restricts the harness to one implementation.
+## The problem
 
-## Repository layout
+White-labelling a project usually means picking the least bad option:
 
+- **Templating tools** (Cookiecutter, Copier, Yeoman) put `{{ placeholders }}`
+  in your source. The repository stops being a working app — you cannot run it,
+  test it or open it without rendering it first.
+- **Forking** gives you a working app and then two codebases that drift apart.
+- **Editing by hand** works once, and nobody remembers which twelve files
+  needed touching.
+
+## How engraft works
+
+Nothing in your source changes shape. `config.json` stays valid JSON,
+`index.html` stays a page you can open. The customization is described
+separately, by two files:
+
+**The template** — written by the maintainer, shipped with the project. It
+declares what can be customized and where it lives.
+
+```yaml
+variables:
+  app_name:
+    description: Application name
+    default: DefaultApp
+
+customizations:
+  - action: json_replace
+    file: config.json
+    replace:
+      - selector: $.name
+        variable: app_name
 ```
-python/       # Python implementation (published to PyPI as `engraft`)
-typescript/   # TypeScript implementation (published to npm as `engraft`)
-e2e/          # Shared behavioural fixtures and pytest harness
-openspec/     # OpenSpec change proposals and specifications
+
+**The values** — written by the consumer, kept outside the project. One per
+brand, customer or deployment.
+
+```yaml
+app_name: MyApp
 ```
+
+Then, from the project directory:
+
+```shell
+engraft apply --template engraft.template.yml --values engraft.values.yml
+```
+
+```diff
+  {
+-   "name": "DefaultApp",
++   "name": "MyApp",
+    "version": "1.0.0"
+  }
+```
+
+One repository, many customizations, no forks. Re-runnable: point it at
+different values and you get a different result from the same starting tree.
+
+## Actions
+
+| Action                                           | For                               | Selector                               |
+| ------------------------------------------------ | --------------------------------- | -------------------------------------- |
+| [`json_replace`](docs/actions/json-replace.md)   | JSON files                        | `$.expo.extra.items[0].label`          |
+| [`html_replace`](docs/actions/html-replace.md)   | HTML files                        | `//meta[@name='description']/@content` |
+| [`regex_replace`](docs/actions/regex-replace.md) | Any text file — source, INI, TOML | `'VERSION = "(?<value>[^"]*)"'`        |
+| [`file_replace`](docs/actions/file-replace.md)   | Whole files, including binaries   | —                                      |
+
+A worked example using all four is in
+[Getting started](docs/getting-started.md#a-more-realistic-template).
+
+## Why it holds up
+
+- **All-or-nothing.** Every action runs against a staging copy first. If one
+  fails, your project is left exactly as it was — no half-applied state.
+  ([Architecture](docs/architecture.md))
+- **Loud about drift.** An HTML selector that matches nothing, or matches three
+  elements, is an error. A regex that stops matching is an error. A
+  customization that silently stopped working is the failure mode engraft
+  exists to prevent.
+- **Optional by design.** A variable with no default and no value leaves its
+  target untouched, so one template can serve consumers who want the logo
+  replaced and consumers who do not.
+  ([Variables](docs/concepts/variables.md))
+
+## Documentation
+
+| Page                                            | What it covers                                     |
+| ----------------------------------------------- | -------------------------------------------------- |
+| [Getting started](docs/getting-started.md)      | Install, first customization, a realistic template |
+| [Concepts](docs/concepts/index.md)              | The two-file model, path resolution, idempotence   |
+| [Template file](docs/concepts/template-file.md) | Full template reference                            |
+| [Values file](docs/concepts/values-file.md)     | Full values reference                              |
+| [Variables](docs/concepts/variables.md)         | Resolution rules and optional variables            |
+| [Actions](docs/actions/index.md)                | The four actions in detail                         |
+| [CLI reference](docs/cli.md)                    | Commands, flags, exit codes, common errors         |
+| [Architecture](docs/architecture.md)            | What happens on disk, and why                      |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, the test layout and the
+release process. Taking part means following our
+[Code of Conduct](CODE_OF_CONDUCT.md). Security issues go through
+[private reporting](SECURITY.md), not the issue tracker.
+
+## Project history
+
+engraft shipped as two parallel implementations — a Python package on PyPI and
+this one on npm — through v0.2.2. Keeping two codebases byte-identical cost
+more than it returned, so TypeScript is now the only implementation. The Python
+package is no longer maintained; `@smartcompanion/engraft` accepts the same
+template and values files.
 
 ## License
 
-See [LICENSE](LICENSE).
+[BSD 2-Clause](LICENSE).
