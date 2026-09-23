@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -34,7 +34,7 @@ jobs:
       # to NODE_AUTH_TOKEN, and trusted publishing authenticates over OIDC
       # instead. Leaving it would point npm at an unset variable.
       - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -50,7 +50,15 @@ jobs:
 
       # Opens (or updates) a "chore: release" pull request collecting the
       # pending changesets. Merging that pull request runs this workflow again,
-      # at which point there are no changesets left and `publish` runs instead.
+      # at which point there are no changesets left and the publish script runs
+      # instead.
+      #
+      # Pinned to v2 deliberately: the action reads the Changesets CLI's output
+      # to learn what was published, and v1 only understands the CLI v2 format.
+      # Paired with the v3 CLI it silently concludes nothing was published, so
+      # it skips pushing git tags and creating GitHub releases while still
+      # exiting 0 -- which is exactly what happened to v0.2.3, whose tag had to
+      # be pushed by hand.
       #
       # RELEASE_TOKEN is a personal access token with contents and pull request
       # write access. It is optional but recommended: pull requests opened with
@@ -58,14 +66,18 @@ jobs:
       # request would sit with no CI checks and main's required checks could
       # never pass on it. Falls back to GITHUB_TOKEN when the secret is absent.
       - name: Create release pull request or publish
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           github-token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
-          version: npm run version
-          publish: npm run release
-          title: "chore: release"
-          commit: "chore: release"
+          version-script: npm run version
+          publish-script: npm run release
+          pr-title: "chore: release"
+          commit-message: "chore: release"
         env:
+          # Not for the action -- v2 takes its token through the github-token
+          # input above. This is for @changesets/changelog-github, which runs
+          # inside `changeset version` and needs a token to turn each changeset
+          # into a changelog entry linking its pull request and author.
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
           # npm authenticates over OIDC against the trusted publisher
           # configured for this package (this repository, this workflow file),
