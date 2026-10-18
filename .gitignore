@@ -11,3 +11,7 @@ coverage/
 
 # npm pack output
 *.tgz
+
+# Docusaurus build output and cache
+packages/docs/build/
+packages/docs/.docusaurus/

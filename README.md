@@ -1,9 +1,19 @@
-# engraft
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/engraft-logo-dark.svg">
+    <img alt="engraft" src="assets/engraft-logo.svg" height="72">
+  </picture>
+</h1>
+
+<p align="center">
 
 [![ci](https://github.com/smartcompanion-app/engraft/actions/workflows/ci.yml/badge.svg)](https://github.com/smartcompanion-app/engraft/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@smartcompanion/engraft)](https://www.npmjs.com/package/@smartcompanion/engraft)
 [![node](https://img.shields.io/node/v/@smartcompanion/engraft)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/@smartcompanion/engraft)](LICENSE)
+[![docs](https://img.shields.io/badge/docs-smartcompanion--app.github.io%2Fengraft-1fbc7e)](https://smartcompanion-app.github.io/engraft/)
+
+</p>
 
 **Apply customizations to any project without templating placeholders.**
 
@@ -74,21 +84,21 @@ different values and you get a different result from the same starting tree.
 
 ## Actions
 
-| Action                                           | For                               | Selector                               |
-| ------------------------------------------------ | --------------------------------- | -------------------------------------- |
-| [`json_replace`](docs/actions/json-replace.md)   | JSON files                        | `$.expo.extra.items[0].label`          |
-| [`html_replace`](docs/actions/html-replace.md)   | HTML files                        | `//meta[@name='description']/@content` |
-| [`regex_replace`](docs/actions/regex-replace.md) | Any text file — source, INI, TOML | `'VERSION = "(?<value>[^"]*)"'`        |
-| [`file_replace`](docs/actions/file-replace.md)   | Whole files, including binaries   | —                                      |
+| Action                                                                                | For                               | Selector                               |
+| ------------------------------------------------------------------------------------- | --------------------------------- | -------------------------------------- |
+| [`json_replace`](https://smartcompanion-app.github.io/engraft/actions/json-replace)   | JSON files                        | `$.expo.extra.items[0].label`          |
+| [`html_replace`](https://smartcompanion-app.github.io/engraft/actions/html-replace)   | HTML files                        | `//meta[@name='description']/@content` |
+| [`regex_replace`](https://smartcompanion-app.github.io/engraft/actions/regex-replace) | Any text file — source, INI, TOML | `'VERSION = "(?<value>[^"]*)"'`        |
+| [`file_replace`](https://smartcompanion-app.github.io/engraft/actions/file-replace)   | Whole files, including binaries   | —                                      |
 
 A worked example using all four is in
-[Getting started](docs/getting-started.md#a-more-realistic-template).
+[Getting started](https://smartcompanion-app.github.io/engraft/getting-started#a-more-realistic-template).
 
 ## Why it holds up
 
 - **All-or-nothing.** Every action runs against a staging copy first. If one
   fails, your project is left exactly as it was — no half-applied state.
-  ([Architecture](docs/architecture.md))
+  ([Architecture](https://smartcompanion-app.github.io/engraft/architecture))
 - **Loud about drift.** An HTML selector that matches nothing, or matches three
   elements, is an error. A regex that stops matching is an error. A
   customization that silently stopped working is the failure mode engraft
@@ -96,20 +106,23 @@ A worked example using all four is in
 - **Optional by design.** A variable with no default and no value leaves its
   target untouched, so one template can serve consumers who want the logo
   replaced and consumers who do not.
-  ([Variables](docs/concepts/variables.md))
+  ([Variables](https://smartcompanion-app.github.io/engraft/concepts/variables))
 
 ## Documentation
 
-| Page                                            | What it covers                                     |
-| ----------------------------------------------- | -------------------------------------------------- |
-| [Getting started](docs/getting-started.md)      | Install, first customization, a realistic template |
-| [Concepts](docs/concepts/index.md)              | The two-file model, path resolution, idempotence   |
-| [Template file](docs/concepts/template-file.md) | Full template reference                            |
-| [Values file](docs/concepts/values-file.md)     | Full values reference                              |
-| [Variables](docs/concepts/variables.md)         | Resolution rules and optional variables            |
-| [Actions](docs/actions/index.md)                | The four actions in detail                         |
-| [CLI reference](docs/cli.md)                    | Commands, flags, exit codes, common errors         |
-| [Architecture](docs/architecture.md)            | What happens on disk, and why                      |
+The full documentation lives at
+**[smartcompanion-app.github.io/engraft](https://smartcompanion-app.github.io/engraft/)**.
+
+| Page                                                                                 | What it covers                                     |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| [Getting started](https://smartcompanion-app.github.io/engraft/getting-started)      | Install, first customization, a realistic template |
+| [Concepts](https://smartcompanion-app.github.io/engraft/concepts)                    | The two-file model, path resolution, idempotence   |
+| [Template file](https://smartcompanion-app.github.io/engraft/concepts/template-file) | Full template reference                            |
+| [Values file](https://smartcompanion-app.github.io/engraft/concepts/values-file)     | Full values reference                              |
+| [Variables](https://smartcompanion-app.github.io/engraft/concepts/variables)         | Resolution rules and optional variables            |
+| [Actions](https://smartcompanion-app.github.io/engraft/actions)                      | The four actions in detail                         |
+| [CLI reference](https://smartcompanion-app.github.io/engraft/cli)                    | Commands, flags, exit codes, common errors         |
+| [Architecture](https://smartcompanion-app.github.io/engraft/architecture)            | What happens on disk, and why                      |
 
 ## Contributing
 

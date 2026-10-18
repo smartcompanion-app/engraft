@@ -99,6 +99,27 @@ jobs:
       # would have caught the npm-bin symlink no-op in v0.2.1.
       - name: Smoke-test the packed tarball
         run: |
-          npm pack --pack-destination /tmp
+          npm pack -w packages/engraft --pack-destination /tmp
           npm install -g /tmp/smartcompanion-engraft-*.tgz
           engraft --version
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Docusaurus fails the build on a broken link or anchor, so this is what
+      # catches a renamed page or heading before it reaches the published site.
+      - name: Build the documentation site
+        run: npm run docs:build

@@ -74,7 +74,7 @@ Two consequences worth knowing:
   sees the first one's result. Ordering within a template is meaningful.
 - An action that writes to a file it does not declare would write outside the
   transaction and break rollback. This is the rule to remember when
-  [adding an action](../CONTRIBUTING.md#adding-an-action).
+  [adding an action](https://github.com/smartcompanion-app/engraft/blob/main/CONTRIBUTING.md#adding-an-action).
 
 Files an action targets that do not exist in the project are simply not staged.
 Each action decides what that means: `json_replace` fails on a missing file,
@@ -127,4 +127,4 @@ missing shebang, an entry point that does not run when invoked through an npm
 bin symlink. That last one shipped in v0.2.1 with a fully green unit suite, and
 is now covered by a test that packs and runs the tarball in CI.
 
-See [Contributing](../CONTRIBUTING.md#testing).
+See [Contributing](https://github.com/smartcompanion-app/engraft/blob/main/CONTRIBUTING.md#testing).

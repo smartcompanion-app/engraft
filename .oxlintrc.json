@@ -18,18 +18,24 @@
     // the behaviour, not an oversight.
     "no-await-in-loop": "off"
   },
-  "ignorePatterns": ["dist", "coverage", "tests/e2e/fixtures"],
+  "ignorePatterns": [
+    "**/dist",
+    "**/coverage",
+    "packages/engraft/tests/e2e/fixtures",
+    "packages/docs/build",
+    "packages/docs/.docusaurus"
+  ],
   "overrides": [
     {
       // Actions register themselves as a side effect of being imported, which
       // is exactly what this barrel exists to trigger.
-      "files": ["src/actions/index.ts"],
+      "files": ["packages/engraft/src/actions/index.ts"],
       "rules": {
         "import/no-unassigned-import": "off"
       }
     },
     {
-      "files": ["tests/**/*.ts"],
+      "files": ["packages/engraft/tests/**/*.ts"],
       "rules": {
         "typescript/no-non-null-assertion": "off",
 

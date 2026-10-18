@@ -39,11 +39,11 @@ get a different result from the same starting repository, every time.
 
 ## Where to go next
 
-| If you want to…                                         | Read                                  |
-| ------------------------------------------------------- | ------------------------------------- |
-| Install it and change your first value                  | [Getting started](getting-started.md) |
-| Understand the template/values split                    | [Concepts](concepts/index.md)         |
-| Look up how a specific action works                     | [Actions](actions/index.md)           |
-| Check a command or flag                                 | [CLI reference](cli.md)               |
-| Know what happens on disk during an apply, and on error | [Architecture](architecture.md)       |
-| Work on engraft itself                                  | [Contributing](../CONTRIBUTING.md)    |
+| If you want to…                                         | Read                                                                                    |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Install it and change your first value                  | [Getting started](getting-started.md)                                                   |
+| Understand the template/values split                    | [Concepts](concepts/index.md)                                                           |
+| Look up how a specific action works                     | [Actions](actions/index.md)                                                             |
+| Check a command or flag                                 | [CLI reference](cli.md)                                                                 |
+| Know what happens on disk during an apply, and on error | [Architecture](architecture.md)                                                         |
+| Work on engraft itself                                  | [Contributing](https://github.com/smartcompanion-app/engraft/blob/main/CONTRIBUTING.md) |

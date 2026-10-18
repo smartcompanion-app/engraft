@@ -71,4 +71,4 @@ there is nothing inside the file to select.
 ## Adding an action
 
 Actions are a plugin registry — see
-[Contributing](../../CONTRIBUTING.md#adding-an-action).
+[Contributing](https://github.com/smartcompanion-app/engraft/blob/main/CONTRIBUTING.md#adding-an-action).

@@ -1,0 +1,19 @@
+{
+  // Not extending @docusaurus/tsconfig: it sets `baseUrl`, which TypeScript 7
+  // removed. Only the config files are type-checked; the site itself is
+  // Markdown and CSS.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["docusaurus.config.ts", "sidebars.ts"]
+}

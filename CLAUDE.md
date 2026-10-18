@@ -4,24 +4,36 @@ CLI tool that applies customizations to any project without requiring
 templating placeholders. Uses a two-file model: a **template** (what can be
 customized) and a **values** file (the consumer's choices).
 
-TypeScript only, published to npm as `@smartcompanion/engraft`. A parallel
+TypeScript only, published to npm as `@smartcompanion/engraft`. An npm
+workspaces monorepo: the CLI package plus a private Docusaurus docs site
+published to https://smartcompanion-app.github.io/engraft/. A parallel
 Python implementation existed through v0.2.2 and was removed — no PyPI package,
 no pytest, no ruff, no `openspec/` directory.
 
 ## Repository layout
 
 ```
-src/            the CLI and engine
-tests/unit/     unit tests (vitest project "unit")
-tests/e2e/      fixture-driven e2e tests (vitest project "e2e")
-docs/           user-facing documentation, Markdown, for a docs site later
-.changeset/     pending release notes
+packages/engraft/         @smartcompanion/engraft, the published CLI
+  src/                    the CLI and engine
+  tests/unit/             unit tests (vitest project "unit")
+  tests/e2e/              fixture-driven e2e tests (vitest project "e2e")
+packages/docs/            @smartcompanion/engraft-docs, private Docusaurus site
+  docs/                   the pages, plain Markdown (CommonMark, not MDX)
+  sidebars.ts             reading order, listed by hand (no front matter)
+  src/css/custom.css      brand colors and fonts
+assets/                   logo, wordmark, icon, social card; README + site share them
+.changeset/               pending release notes
 ```
+
+Root `package.json` only holds workspaces, shared tooling (oxlint, oxfmt,
+changesets) and scripts that forward with `-w packages/<name>`. Lint and
+format configs live at the root and cover both packages. `overrides` must stay
+at the root — npm ignores them in workspace packages.
 
 ## Architecture
 
 ```
-src/cli.ts (commander)
+packages/engraft/src/cli.ts (commander)
  └─ engine.ts                # resolves variables, runs actions in order,
      │                       # stages in .engraft/, rolls back on failure
      ├─ models.ts             # parses template + values YAML via js-yaml
@@ -36,12 +48,13 @@ src/cli.ts (commander)
          └─ fileReplace.ts    # whole-file replacement
 ```
 
-`docs/architecture.md` has the full picture, including why the staging
+`packages/docs/docs/architecture.md` has the full picture, including why the staging
 directory exists.
 
 Adding an action: implement it, register it under a snake_case name, import it
 from `src/actions/index.ts`, add unit tests, **add an e2e fixture**, and
-document it under `docs/actions/`.
+document it under `packages/docs/docs/actions/` (plus an entry in
+`packages/docs/sidebars.ts`).
 
 ## Commands
 
@@ -53,9 +66,11 @@ npm run test:unit      # unit project only, no build needed
 npm run test:e2e       # builds, then the e2e project only
 npm run lint           # oxlint --deny-warnings
 npm run format         # oxfmt (format:check in CI)
-npm run typecheck      # tsc --noEmit
+npm run typecheck      # tsc in both packages
 npm run check:publish  # publint against the would-be tarball
-node dist/cli.js apply --template <f> --values <f>
+npm run docs:start     # docs site with live reload
+npm run docs:build     # docs site → packages/docs/build; fails on broken links
+node packages/engraft/dist/cli.js apply --template <f> --values <f>
 ```
 
 Full gate before pushing:
@@ -82,7 +97,7 @@ Two vitest projects, declared in `vitest.config.ts`:
 - `e2e` — runs `dist/cli.js` as a subprocess. Its global setup fails with a
   clear message if the build is missing.
 
-`tests/e2e/fixtures/<name>/` holds `input/`, `template.yaml`, `values.yaml`,
+`packages/engraft/tests/e2e/fixtures/<name>/` holds `input/`, `template.yaml`, `values.yaml`,
 `expected/`, and an optional `expect_failure` marker. Adding a scenario means
 adding a directory. Comparison is semantic (JSON/YAML/HTML parsed and compared
 structurally, everything else as text) — see `tests/e2e/comparators.ts`.
@@ -100,6 +115,8 @@ publishes to npm over trusted publishing (OIDC, no stored token). Pushing a
 ## CI
 
 - `.github/workflows/ci.yml` — lint/format/typecheck, a test matrix on Node 22
-  and 24, and a package job that runs publint and smoke-tests the packed
+  and 24, a docs build, and a package job that runs publint and smoke-tests the packed
   tarball via a global install.
 - `.github/workflows/release.yml` — the changesets release/publish flow.
+- `.github/workflows/pages.yml` — builds the docs site and deploys it to
+  GitHub Pages on every push to `main`.
