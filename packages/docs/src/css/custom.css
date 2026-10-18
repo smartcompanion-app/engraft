@@ -1,0 +1,75 @@
+/*
+ * engraft brand: graft green on ink, Outfit for headings and the wordmark,
+ * Inter for body text. Fonts are self-hosted through @fontsource, so the
+ * site makes no requests to Google Fonts.
+ *
+ * The brand green (#1fbc7e) is too light for link text on white, so light
+ * mode uses a darker shade of it (#157e54, 5:1 on white) as the primary
+ * color. Dark mode uses the brand green as is.
+ */
+
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/outfit";
+
+:root {
+  --engraft-green: #1fbc7e;
+  --engraft-ink: #1b2732;
+  --engraft-ink-deep: #141c24;
+  --engraft-light: #eef1f3;
+
+  --ifm-color-primary: #157e54;
+  --ifm-color-primary-dark: #13714c;
+  --ifm-color-primary-darker: #126b47;
+  --ifm-color-primary-darkest: #0f583b;
+  --ifm-color-primary-light: #2c8b65;
+  --ifm-color-primary-lighter: #38916e;
+  --ifm-color-primary-lightest: #5ba587;
+
+  --ifm-font-family-base: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ifm-heading-font-family: "Outfit Variable", var(--ifm-font-family-base);
+  --ifm-heading-font-weight: 700;
+  --ifm-font-color-base: var(--engraft-ink);
+  --ifm-heading-color: var(--engraft-ink);
+  --ifm-code-font-size: 95%;
+  --ifm-footer-background-color: var(--engraft-ink);
+
+  --docusaurus-highlighted-code-line-bg: rgb(31 188 126 / 12%);
+}
+
+html[data-theme="dark"] {
+  --ifm-color-primary: #1fbc7e;
+  --ifm-color-primary-dark: #1ca971;
+  --ifm-color-primary-darker: #1aa06b;
+  --ifm-color-primary-darkest: #168458;
+  --ifm-color-primary-light: #35c38b;
+  --ifm-color-primary-lighter: #41c691;
+  --ifm-color-primary-lightest: #62d0a5;
+
+  --ifm-background-color: var(--engraft-ink-deep);
+  --ifm-background-surface-color: var(--engraft-ink);
+  --ifm-navbar-background-color: var(--engraft-ink);
+  --ifm-footer-background-color: var(--engraft-ink);
+  --ifm-font-color-base: var(--engraft-light);
+  --ifm-heading-color: #ffffff;
+
+  --docusaurus-highlighted-code-line-bg: rgb(31 188 126 / 18%);
+}
+
+/* The wordmark is Outfit ExtraBold, lowercase, slightly tight. */
+.navbar__title {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+.footer--dark {
+  --ifm-footer-link-color: var(--engraft-light);
+  --ifm-footer-link-hover-color: var(--engraft-green);
+}

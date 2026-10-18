@@ -1,4 +1,12 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["dist", "coverage", "package-lock.json", "CHANGELOG.md", "tests/e2e/fixtures"]
+  "ignorePatterns": [
+    "**/dist",
+    "**/coverage",
+    "package-lock.json",
+    "**/CHANGELOG.md",
+    "packages/engraft/tests/e2e/fixtures",
+    "packages/docs/build",
+    "packages/docs/.docusaurus"
+  ]
 }
